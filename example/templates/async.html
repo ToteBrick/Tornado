@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>异步测试页面</title>
+
+	</head>
+	<body>
+		<input id="search" type="text" placeholder="请输入检索关键字" />
+		<input  type="button" onclick="request()" value="检索" />
+		<div id="result">
+			<p>检索结果</p>
+			<table id="res_list"></table>
+		</div>
+		<script type="text/javascript">
+			function request(){
+				var result = document.getElementById("res_list");
+				var search = document.getElementById("search").value;
+				var ajax = new XMLHttpRequest();
+				ajax.open("post","/", true)
+				ajax.setRequestHeader("Content-Type", "application/json");
+				ajax.onreadystatechange = function () {
+					if(ajax.readyState == 4){
+						if(ajax.status == 200){
+							res_obj=JSON.parse(ajax.responseText).result;
+							result.innerHTML = "";
+							for(var i=0; i<res_obj.length;i++){
+								html_text = "<tr>"+
+									"<td>"+res_obj[i][0]+"<td/>"+
+									"<td>"+res_obj[i][1]+"<td/>"+
+									"</tr>"
+								result.innerHTML = result.innerHTML + html_text							};
+						};
+					};
+				};
+				ajax.send(JSON.stringify({"search":search}));
+			};
+		</script>
+	</body>
+</html>
