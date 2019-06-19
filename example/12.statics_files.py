@@ -21,8 +21,8 @@ if __name__ == "__main__":
              {"path": os.path.join(current_path, "statics/html"), "default_filename": "index.html"}),
             (r'^/view/(.*)$', StaticFileHandler, {"path": os.path.join(current_path, "statics/html")}),
         ],
-        static_path=os.path.join(current_path, "statics"),
-
+        static_path=os.path.join(current_path, "statics"), #静态文件
+        template_path=os.path.join(os.path.dirname(__file__), "templates") # 模板渲染
     )
 
     app.listen(8001)
