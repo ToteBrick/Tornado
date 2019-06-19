@@ -1,29 +1,32 @@
-# -*- coding:utf-8 -*-
+# _*_coding: utf-8 _*_
 import os
 
-from tornado.web import Application, RequestHandler, StaticFileHandler
-from tornado.ioloop import IOLoop
+import tornado.web
+import tornado.httpserver
+import tornado.ioloop
+from tornado.options import define, options
 
 
-class IndexHandler(RequestHandler):
+define("port", default=8001, help="run on the given port", type=int)
+
+
+class IndexHandler(tornado.web.RequestHandler):
 
     def get(self):
-        self.write('index')
-        print(os.path.dirname(__file__))
+        name = self.get_argument("name", "python", True)
+        self.render('index.html', name=name)
 
 
 if __name__ == "__main__":
-    current_path = os.path.dirname(__file__)
-    app = Application(
-        [
-            (r"/", IndexHandler),
-            (r'^/()$', StaticFileHandler,
-             {"path": os.path.join(current_path, "statics/html"), "default_filename": "index.html"}),
-            (r'^/view/(.*)$', StaticFileHandler, {"path": os.path.join(current_path, "statics/html")}),
-        ],
-        static_path=os.path.join(current_path, "statics"), #静态文件
-        template_path=os.path.join(os.path.dirname(__file__), "templates") # 模板渲染
-    )
-
-    app.listen(8001)
-    IOLoop.current().start()
+    tornado.options.parse_command_line()
+    base_dir = os.path.dirname(__file__)
+    handlers = [(r"/", IndexHandler), ]
+    settings = {
+        "template_path": os.path.join(base_dir, "templates"),
+        "static_path": os.path.join(base_dir, "statics"),
+        "debug": True
+    }
+    app = tornado.web.Application(handlers, **settings)
+    http_server = tornado.httpserver.HTTPServer(app)
+    http_server.listen(options.port)
+    tornado.ioloop.IOLoop.current().start()
