@@ -3,6 +3,7 @@
 from tornado.web import Application, RequestHandler, url
 from tornado.ioloop import IOLoop
 from tornado.httpserver import HTTPServer
+import config
 
 
 class IndexHandler(RequestHandler):
@@ -33,7 +34,7 @@ if __name__ == "__main__":
             (r"/", IndexHandler),
             (r"/register", RegistHandler, {"title": "会员注册"}),
             url(r"/login", LoginHandler, name="login"),
-        ]
+        ],  **config.settings
     )
 
     http_server = HTTPServer(app)
